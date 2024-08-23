@@ -20,6 +20,7 @@ const itemSchema: Schema<ItemType> = new Schema<ItemType>(
     name: {
       type: String,
       required: true,
+      unique: true,
     },
     description: {
       type: [String], 
