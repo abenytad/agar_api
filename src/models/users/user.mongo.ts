@@ -1,8 +1,13 @@
 import { Document, Schema, model, Model } from 'mongoose';
+import { Types } from 'mongoose';
 export interface UserType extends Document {
+    _id: Types.ObjectId;
     name: string;
     phoneNumber: string;
     orders:string[];
+}
+interface UserModel extends Model<UserType> {
+    login(phoneNumber: number, password: string): Promise<UserType | null>;
 }
 
 const userSchema:Schema<UserType>=new Schema<UserType>(
@@ -25,5 +30,5 @@ const userSchema:Schema<UserType>=new Schema<UserType>(
     { timestamps: true }
 );
 
-const User:Model<UserType>=model<UserType>('User',userSchema);
+const User: UserModel = model<UserType, UserModel>('User', userSchema);
 export default User;
