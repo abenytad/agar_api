@@ -21,7 +21,13 @@ const getCategoriesId = async (): Promise<string[]|[]> => {
   const getCategoryDetails = async (categoryId:string): Promise<CategoryType | null> => {
      return await Category.findById(categoryId).lean();
   };
+  const getItem = async (itemId:string): Promise<ItemType | null> => {
+    return await Item.findById(itemId,{
+      createdAt:0,
+      updatedAt:0,
+    }).lean();
+ };
 
 
 
-  export {getCategoriesId,addCategory,addItem,getItemsId,getCategoryDetails};
+  export {getCategoriesId,addCategory,addItem,getItemsId,getCategoryDetails,getItem};
