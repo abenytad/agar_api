@@ -1,11 +1,12 @@
 import { Document, Schema, model, Model } from "mongoose";
+
 export interface OrderType extends Document {
   orderedBy: Schema.Types.ObjectId;
   orderedItems: Schema.Types.ObjectId[];
   deliverTo: string;
   city: string;
-  status: StatusEnum;
-  interactedAdmin: Schema.Types.ObjectId;
+  status?: StatusEnum;
+  interactedAdmin?: Schema.Types.ObjectId;
   historyTime: {
     orderedTime: Date;
     acceptedTime?: Date; // Optional field
@@ -13,11 +14,12 @@ export interface OrderType extends Document {
     deliveredTime?: Date; // Optional field
   };
 }
+
 export enum StatusEnum {
-  PENDING = "Pending",
-  ACCEPTED = "Accepted",
-  CANCELLED = "Cancelled",
-  DELIVERED = "Delivered",
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  CANCELLED = "cancelled",
+  DELIVERED = "delivered",
 }
 
 const orderSchema: Schema<OrderType> = new Schema<OrderType>(
@@ -44,6 +46,7 @@ const orderSchema: Schema<OrderType> = new Schema<OrderType>(
     status: {
       type: String,
       enum: Object.values(StatusEnum),
+      default: StatusEnum.PENDING, // Use the enum value directly
       required: true,
     },
     interactedAdmin: {
@@ -53,6 +56,7 @@ const orderSchema: Schema<OrderType> = new Schema<OrderType>(
     historyTime: {
       orderedTime: {
         type: Date,
+        default: Date.now, // Set the default to the current date and time
         required: true,
       },
       acceptedTime: {
@@ -69,5 +73,5 @@ const orderSchema: Schema<OrderType> = new Schema<OrderType>(
   { timestamps: true }
 );
 
-
-export const Order: Model<OrderType> = model<OrderType>("Order", orderSchema);
+const Order: Model<OrderType> = model<OrderType>("Order", orderSchema);
+export default Order;

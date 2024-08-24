@@ -14,7 +14,7 @@ const getCategoriesId = async (): Promise<string[]|[]> => {
   }
 
   const getItemsId = async (categoryId:string): Promise<string[]|[]> => {
-    const objectId = new Types.ObjectId(categoryId);
+    // const objectId = new Types.ObjectId(categoryId);
     const items = await Item.find({ categoryId }).select('_id').lean().exec();
     return items.map((item) => item._id.toString()); 
   };
