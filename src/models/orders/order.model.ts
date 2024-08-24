@@ -1,4 +1,5 @@
 import Order,{OrderType,StatusEnum} from "./order.mongo";
+
 const addOrder=async (orderData:OrderType):Promise<OrderType | null>=>{
     return await Order.create(orderData);
 }
@@ -32,5 +33,44 @@ const getRunningOrders = async (userId: string): Promise<{ _id: string; status?:
     }));
  
 };
+const getOrderDetails = async (orderId: string): Promise<OrderType | null> => {
+  try {
+    const order = await Order.findOne(
+      { _id: orderId },
+      { __v: 0, createdAt: 0, updatedAt: 0 } // 
+    ).lean(); 
 
-export {addOrder,getDoneOrders,getRunningOrders};
+    return order as OrderType | null; 
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    throw new Error('Unable to fetch order details');
+  }
+};
+const changeStatus = async (orderId: string): Promise<OrderType | null> => {
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    // Toggle status between "pending" and "cancelled"
+    if (order.status === StatusEnum.PENDING) {
+      order.status = StatusEnum.CANCELLED;
+    } else if (order.status === StatusEnum.CANCELLED) {
+      order.status = StatusEnum.PENDING;
+    } else {
+      throw new Error('Status change is only allowed between "pending" and "cancelled"');
+    }
+
+    order.historyTime.updatedTime = new Date(); 
+    const updatedOrder = await order.save();
+    return updatedOrder;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error; 
+  }
+};
+
+
+
+export {addOrder,getDoneOrders,getRunningOrders,getOrderDetails,changeStatus};

@@ -9,9 +9,7 @@ export interface OrderType extends Document {
   interactedAdmin?: Schema.Types.ObjectId;
   historyTime: {
     orderedTime: Date;
-    acceptedTime?: Date; // Optional field
-    cancelledTime?: Date; // Optional field
-    deliveredTime?: Date; // Optional field
+    updatedTime?: Date;
   };
 }
 
@@ -59,13 +57,7 @@ const orderSchema: Schema<OrderType> = new Schema<OrderType>(
         default: Date.now, // Set the default to the current date and time
         required: true,
       },
-      acceptedTime: {
-        type: Date,
-      },
-      cancelledTime: {
-        type: Date,
-      },
-      deliveredTime: {
+      updatedTime: {
         type: Date,
       },
     },

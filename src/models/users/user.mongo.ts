@@ -4,7 +4,6 @@ export interface UserType extends Document {
     _id: Types.ObjectId;
     name: string;
     phoneNumber: string;
-    orders:string[];
 }
 interface UserModel extends Model<UserType> {
     login(phoneNumber: number, password: string): Promise<UserType | null>;
@@ -21,11 +20,6 @@ const userSchema:Schema<UserType>=new Schema<UserType>(
             required: true,
             unique: true,
         },
-        orders: [
-            {
-                type:String
-            }
-        ]
     },
     { timestamps: true }
 );
