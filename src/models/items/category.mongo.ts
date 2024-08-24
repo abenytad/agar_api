@@ -5,7 +5,7 @@ export interface CategoryType extends Document {
   name: string;
   description: string;
   imageUrl?: string;
-  items: Schema.Types.ObjectId[];
+  items?: Schema.Types.ObjectId[];
 }
 
 
@@ -22,12 +22,6 @@ const categorySchema: Schema<CategoryType> = new Schema<CategoryType>(
     imageUrl: {
       type: String,
     },
-    items: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Item", 
-      },
-    ],
   },
   { timestamps: true }
 );

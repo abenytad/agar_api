@@ -1,6 +1,6 @@
 import { Request,Response } from "express";
 import { CategoryType } from "../models/items/category.mongo";
-import { getCategoriesId,addItem,addCategory,getItemsId } from "../models/items/items.model";
+import { getCategoriesId,addItem,addCategory,getItemsId,getCategoryDetails } from "../models/items/items.model";
 import { ItemType } from "../models/items/item.mongo";
 
 const fetchCategoriesId = async (req: Request, res: Response) => {
@@ -41,15 +41,17 @@ const fetchCategoriesId = async (req: Request, res: Response) => {
 
   const fetchItemsIdForCategory = async (req: Request, res: Response) => {
     try {
-        const categoryIds: string[] = await getCategoriesId();
-        const result = [];
-        for (const categoryId of categoryIds) {
-            const itemIds = await getItemsId(categoryId);
-            result.push({
-                categoryId,
-                itemIds
-            });
+       const {categoryId}:{categoryId?:string}=req.params;
+        const category:CategoryType | null=await getCategoryDetails(categoryId);
+        if (!category) {
+          return res.status(404).json({ error: "Category not found" });
         }
+          const itemIds = await getItemsId(categoryId);
+          const result = {
+            ...category.toObject(),
+            items: itemIds
+          };
+        
         return res.status(200).json(result);
     } catch (err) {
         return res.status(500).json({ error: `${err}` });

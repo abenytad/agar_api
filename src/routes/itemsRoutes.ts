@@ -5,7 +5,7 @@ const itemsRouter: Router = Router();
 itemsRouter.get('/category/ids',fetchCategoriesId);
 itemsRouter.post('/category',createCategory);
 itemsRouter.post('',createItem);
-itemsRouter.get('/ids',fetchItemsIdForCategory);
+itemsRouter.get('/ids/:categoryId',fetchItemsIdForCategory);
 
 
 export default itemsRouter;
