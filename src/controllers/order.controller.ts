@@ -59,8 +59,8 @@ const fetchOrderDetails = async (req: Request, res: Response) => {
     };
     return res.status(200).json(data);
   } catch (err) {
-    console.error('Error fetching order details:', err); // Log error for debugging
-    return res.status(500).json({ error: 'Internal Server Error' }); // Return a generic error message
+    console.error('Error fetching order details:', err); 
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
@@ -71,7 +71,6 @@ const changeOrderStatus = async (req: Request, res: Response) => {
     if (!updatedOrder) {
       return res.status(404).json({ error: 'Order not found' });
     }
-
     return res.status(200).json(updatedOrder);
   } catch (err) {
     console.error('Error updating order status:', err);
