@@ -1,6 +1,6 @@
 import { Request,Response } from "express";
 import { CategoryType } from "../models/items/category.mongo";
-import { getCategoriesId,addItem,addCategory,getItemsId,getCategoryDetails,getItem } from "../models/items/items.model";
+import { getCategoriesId,addItem,addCategory,getItemsId,getCategoryDetails,getItem,removeItem, removeCategory } from "../models/items/items.model";
 import { ItemType } from "../models/items/item.mongo";
 
 const fetchCategoriesId = async (req: Request, res: Response) => {
@@ -77,4 +77,29 @@ const fetchCategoriesId = async (req: Request, res: Response) => {
     }
  }
 
-  export {fetchCategoriesId,createItem,createCategory,fetchItemsIdForCategory,fetchItem};
+ const deleteItem=async(req:Request,res:Response)=>{
+  try{
+      const { itemId }: { itemId?: string } = req.params;
+          const item:ItemType | null=await removeItem(itemId);
+      if (!item) {
+          return res.status(404).json({ message: 'Item not found' });
+      }
+      res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (err) {
+      return res.status(404).json({ error: `${err}` });
+    }
+}
+const deleteCategory=async(req:Request,res:Response)=>{
+  try{
+      const { categoryId }: { categoryId?: string } = req.params;
+          const category:CategoryType | null=await removeCategory(categoryId);
+      if (!category) {
+          return res.status(404).json({ message: 'Category not found' });
+      }
+      res.status(200).json({ message: 'Item deleted successfully' });
+  } catch (err) {
+      return res.status(404).json({ error: `${err}` });
+    }
+}
+
+  export {fetchCategoriesId,createItem,createCategory,fetchItemsIdForCategory,fetchItem,deleteItem,deleteCategory};

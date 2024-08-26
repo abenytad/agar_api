@@ -52,8 +52,6 @@ const changeStatus = async (orderId: string): Promise<OrderType | null> => {
     if (!order) {
       throw new Error('Order not found');
     }
-
-    // Toggle status between "pending" and "cancelled"
     if (order.status === StatusEnum.PENDING) {
       order.status = StatusEnum.CANCELLED;
     } else if (order.status === StatusEnum.CANCELLED) {
@@ -71,6 +69,57 @@ const changeStatus = async (orderId: string): Promise<OrderType | null> => {
   }
 };
 
+const getAllPendingOrders = async (): Promise<OrderType[] | [] > => {
+  const orders = await Order.find({
+    status: { $in: [StatusEnum.PENDING]} 
+  },{ __v: 0, createdAt: 0, updatedAt: 0 })
+  .sort({ 'historyTime.orderedTime': -1 });
+  return orders;
+};
+
+const getAllAcceptedOrders = async (): Promise<OrderType[] | [] > => {
+  const orders = await Order.find({
+    status: { $in: [StatusEnum.ACCEPTED]} 
+  },{ __v: 0, createdAt: 0, updatedAt: 0 })
+  .sort({ 'historyTime.orderedTime': -1 });
+  return orders;
+};
+const getAllCancelledOrders = async (): Promise<OrderType[] | [] > => {
+  const orders = await Order.find({
+    status: { $in: [StatusEnum.CANCELLED]} 
+  },{ __v: 0, createdAt: 0, updatedAt: 0 })
+  .sort({ 'historyTime.orderedTime': -1 });
+  return orders;
+};
+const getAllDeliveredOrders = async (): Promise<OrderType[] | [] > => {
+  const orders = await Order.find({
+    status: { $in: [StatusEnum.DELIVERED]} 
+  },{ __v: 0, createdAt: 0, updatedAt: 0 })
+  .sort({ 'historyTime.orderedTime': -1 });
+  return orders;
+};
+
+const getAllOrders = async (): Promise<OrderType[] | [] > => {
+  const orders = await Order.find({},{ __v: 0, createdAt: 0, updatedAt: 0 })
+  .sort({ 'historyTime.orderedTime': -1 });
+  return orders;
+};
 
 
-export {addOrder,getDoneOrders,getRunningOrders,getOrderDetails,changeStatus};
+const changeOrderStatusByAdmin = async (orderId: string,newStatus:StatusEnum): Promise<OrderType | null> => {
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) {
+      throw new Error('Order not found');
+    }
+   order.status = newStatus;
+    order.historyTime.updatedTime = new Date(); 
+    const updatedOrder = await order.save();
+    return updatedOrder;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error; 
+  }
+};
+
+export {addOrder,getDoneOrders,getRunningOrders,getOrderDetails,changeStatus,getAllAcceptedOrders,getAllCancelledOrders,getAllDeliveredOrders,getAllPendingOrders,getAllOrders,changeOrderStatusByAdmin};

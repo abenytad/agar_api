@@ -14,7 +14,6 @@ const getCategoriesId = async (): Promise<string[]|[]> => {
   }
 
   const getItemsId = async (categoryId:string): Promise<string[]|[]> => {
-    // const objectId = new Types.ObjectId(categoryId);
     const items = await Item.find({ categoryId }).select('_id').lean().exec();
     return items.map((item) => item._id.toString()); 
   };
@@ -28,6 +27,13 @@ const getCategoriesId = async (): Promise<string[]|[]> => {
     }).lean();
  };
 
+ const removeItem = async (itemId:string): Promise<ItemType | null> => {
+  return await Item.findByIdAndDelete(itemId).lean();
+}; 
+const removeCategory = async (categoryId: string): Promise<CategoryType | null> => {
+  await Item.deleteMany({ categoryId: categoryId });
+  return await Category.findByIdAndDelete(categoryId).lean();
+};
 
 
-  export {getCategoriesId,addCategory,addItem,getItemsId,getCategoryDetails,getItem};
+  export {getCategoriesId,addCategory,addItem,getItemsId,getCategoryDetails,getItem,removeItem,removeCategory};
