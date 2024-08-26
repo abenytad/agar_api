@@ -1,29 +1,60 @@
-import User, {UserType} from "./user.mongo";
+import User, { UserType } from './user.mongo';
 
-const addUser=async(userData:UserType):Promise<UserType>=>{
-    return await User.create(userData);
-}
-const getUser = async (userId: string): Promise<UserType | null> => {
-    return await User.findById(userId,{
-        _id: 1,
-        name: 1,
-       phoneNumber:1,
-       orders:1
-      });
-  };
-  const getUserByPhoneNumber = async (
-    phoneNumber: string,
-    userId: string
-  ): Promise<boolean> => {
-    const existingUser: UserType | null = await User.findOne({ phoneNumber }).exec();
-    if (existingUser && existingUser._id.toString() !== userId) {
-      return false;
+const addUser = async (userData: Partial<UserType>): Promise<UserType> => {
+    try {
+        const user = new User(userData);
+        return await user.save();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Error creating user: ${error.message}`);
+        } else {
+            throw new Error('Unknown error occurred while creating user');
+        }
     }
-    return true;
-  };
-  const removeUser=async (id:string):Promise<UserType |null>=>{
-    const user = await User.findByIdAndDelete(id);
-    return user;
-  }
+};
 
-  export {addUser,getUser,getUserByPhoneNumber,removeUser};
+const getUser = async (userId: string): Promise<UserType | null> => {
+    try {
+        return await User.findById(userId, {
+            _id: 1,
+            name: 1,
+            phoneNumber: 1,
+        }).lean();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Error fetching user: ${error.message}`);
+        } else {
+            throw new Error('Unknown error occurred while fetching user');
+        }
+    }
+};
+
+const getUserByPhoneNumber = async (
+    phoneNumber: string,
+    userId?: string
+): Promise<boolean> => {
+    try {
+        const existingUser = await User.findOne({ phoneNumber }).lean();
+        return !(existingUser && existingUser._id.toString() !== userId);
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Error checking phone number: ${error.message}`);
+        } else {
+            throw new Error('Unknown error occurred while checking phone number');
+        }
+    }
+};
+
+const removeUser = async (userId: string): Promise<UserType | null> => {
+    try {
+        return await User.findByIdAndDelete(userId).lean();
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Error deleting user: ${error.message}`);
+        } else {
+            throw new Error('Unknown error occurred while deleting user');
+        }
+    }
+};
+
+export { addUser, getUser, getUserByPhoneNumber, removeUser };

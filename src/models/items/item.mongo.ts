@@ -1,6 +1,5 @@
 import { Document, Schema, model, Model } from "mongoose";
 
-
 export interface ItemType extends Document {
   categoryId: Schema.Types.ObjectId;
   name: string;
@@ -23,7 +22,7 @@ const itemSchema: Schema<ItemType> = new Schema<ItemType>(
       unique: true,
     },
     description: {
-      type: [String], 
+      type: [String],
       required: true,
     },
     imageUrl: {

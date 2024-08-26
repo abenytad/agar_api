@@ -5,7 +5,7 @@ export interface OrderType extends Document {
   orderedItems: Schema.Types.ObjectId[];
   deliverTo: string;
   city: string;
-  status?: StatusEnum;
+  status: StatusEnum; // Changed to non-optional since it's required
   interactedAdmin?: Schema.Types.ObjectId;
   historyTime: {
     orderedTime: Date;
@@ -44,8 +44,7 @@ const orderSchema: Schema<OrderType> = new Schema<OrderType>(
     status: {
       type: String,
       enum: Object.values(StatusEnum),
-      default: StatusEnum.PENDING, // Use the enum value directly
-      required: true,
+      default: StatusEnum.PENDING,
     },
     interactedAdmin: {
       type: Schema.Types.ObjectId,
@@ -54,7 +53,7 @@ const orderSchema: Schema<OrderType> = new Schema<OrderType>(
     historyTime: {
       orderedTime: {
         type: Date,
-        default: Date.now, // Set the default to the current date and time
+        default: Date.now,
         required: true,
       },
       updatedTime: {
