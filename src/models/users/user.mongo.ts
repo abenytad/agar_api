@@ -7,7 +7,7 @@ export interface UserType extends Document {
 }
 
 interface UserModel extends Model<UserType> {
-    login(phoneNumber: number, password: string): Promise<UserType | null>;
+    login(phoneNumber: string, password: string): Promise<UserType | null>;
 }
 
 const userSchema: Schema<UserType> = new Schema<UserType>(

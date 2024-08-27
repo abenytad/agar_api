@@ -40,7 +40,7 @@ const getItemsId = async (categoryId: string): Promise<string[]> => {
 
 const getCategoryDetails = async (categoryId: string): Promise<CategoryType | null> => {
   try {
-    return await Category.findById(categoryId).populate('items').lean();
+    return await Category.findById(categoryId).lean();
   } catch (error) {
     throw new Error(`Error fetching category details: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
@@ -53,6 +53,7 @@ const getItem = async (itemId: string): Promise<ItemType | null> => {
     throw new Error(`Error fetching item: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 };
+
 
 const removeItem = async (itemId: string): Promise<ItemType | null> => {
   try {
@@ -75,4 +76,25 @@ const removeCategory = async (categoryId: string): Promise<CategoryType | null> 
   }
 };
 
-export { getCategoriesId, addCategory, addItem, getItemsId, getCategoryDetails, getItem, removeItem, removeCategory };
+const getAllCategories = async (): Promise<CategoryType[]> => {
+  try {
+    return await Category.find({}, {
+      _id: 1,
+      name: 1,
+      description: 1,
+      imageUrl: 1
+    })
+    .sort({ createdAt: -1 })  
+    .lean();
+  } catch (error) {
+    throw new Error(`Error getting the categories: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+};
+const getItemForCategory = async (categoryId: string): Promise<ItemType | null> => {
+  try {
+    return await Item.findOne({categoryId}).select('-createdAt -updatedAt -__v').lean();
+  } catch (error) {
+    throw new Error(`Error fetching item: ${error instanceof Error ? error.message : "Unknown error"}`);
+  }
+};
+export { getCategoriesId, addCategory, addItem, getItemsId, getCategoryDetails, getItem, removeItem, removeCategory,getAllCategories,getItemForCategory };

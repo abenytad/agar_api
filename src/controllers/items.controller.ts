@@ -10,6 +10,8 @@ import {
   getItem,
   removeItem,
   removeCategory,
+  getAllCategories,
+  getItemForCategory
 } from "../models/items/items.model";
 
 const fetchCategoriesId = async (req: Request, res: Response): Promise<Response> => {
@@ -108,6 +110,40 @@ const deleteCategory = async (req: Request, res: Response): Promise<Response> =>
     return res.status(500).json({ error: `Failed to delete category: ${err}` });
   }
 };
+const getCategories = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const categories = await getAllCategories();
+    return res.status(200).json(categories);
+  } catch (err) {
+    return res.status(500).json({ error: `Failed to delete category: ${err}` });
+  }
+};
+
+const getCategoryWithItems = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { categoryId } = req.params;
+
+    if (!categoryId) {
+      return res.status(400).json({ message: "Category ID is required" });
+    }
+
+    const category = await getCategoryDetails(categoryId);
+
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    const items = await getItemForCategory(categoryId);
+    const data = {
+      ...category,
+      items,
+    };
+
+    return res.status(200).json(data);
+  } catch (err) {
+    return res.status(500).json({ error: `Failed to fetch the category: ${err instanceof Error ? err.message : "Unknown error"}` });
+  }
+};
 
 export {
   fetchCategoriesId,
@@ -117,4 +153,6 @@ export {
   fetchItem,
   deleteItem,
   deleteCategory,
+  getCategories,
+  getCategoryWithItems
 };
