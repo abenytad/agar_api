@@ -38,7 +38,5 @@ adminSchema.pre<AdminType>('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
 const Admin: Model<AdminType> = model<AdminType>('Admin', adminSchema);
-
 export default Admin;

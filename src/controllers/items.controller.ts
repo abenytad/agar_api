@@ -25,7 +25,7 @@ const fetchCategoriesId = async (req: Request, res: Response): Promise<Response>
 
 const createCategory = async (req: Request, res: Response): Promise<Response> => {
   try {
-    const data: Omit<CategoryType, "items"> = req.body;
+    const data: CategoryType = req.body;
     const category = await addCategory(data);
     if (!category) {
       return res.status(404).json({ error: "Category creation failed" });
@@ -49,19 +49,22 @@ const createItem = async (req: Request, res: Response): Promise<Response> => {
   }
 };
 
-const fetchItemsIdForCategory = async (req: Request, res: Response): Promise<Response> => {
+const fetchItemsDetailForCategory = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { categoryId } = req.params;
     if (!categoryId) {
       return res.status(400).json({ error: "Category ID is required" });
     }
-
     const category = await getCategoryDetails(categoryId);
     if (!category) {
       return res.status(404).json({ error: "Category not found" });
     }
-
-    return res.status(200).json(category);
+    const items=await getItemsId(categoryId);
+    const data={
+      ...category,
+      items
+    }
+    return res.status(200).json(data);
   } catch (err) {
     return res.status(500).json({ error: `Failed to fetch items for category: ${err}` });
   }
@@ -73,7 +76,6 @@ const fetchItem = async (req: Request, res: Response): Promise<Response> => {
     if (!itemId) {
       return res.status(400).json({ error: "Item ID is required" });
     }
-
     const item = await getItem(itemId);
     if (!item) {
       return res.status(404).json({ error: "Item not found" });
@@ -149,7 +151,7 @@ export {
   fetchCategoriesId,
   createCategory,
   createItem,
-  fetchItemsIdForCategory,
+  fetchItemsDetailForCategory,
   fetchItem,
   deleteItem,
   deleteCategory,

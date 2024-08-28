@@ -6,13 +6,19 @@ const createUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const userData: Partial<UserType> = req.body;
         const user = await addUser(userData);
+        if (!user) {
+            return res.status(400).json({ error: 'User could not be created' });
+        }
+
         return res.status(201).json(user);
-    } catch (err) {
+    } catch (err: any) { 
+        if (err?.code === 11000) {
+            return res.status(400).json({ error: 'Phone number already exists' });
+        }
         console.error('Error creating user:', err);
         return res.status(500).json({ error: 'An error occurred while creating the user' });
     }
 };
-
 const fetchUser = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { userId } = req.params;

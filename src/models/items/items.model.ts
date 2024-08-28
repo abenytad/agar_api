@@ -11,19 +11,21 @@ const getCategoriesId = async (): Promise<string[]> => {
   }
 };
 
-const addCategory = async (catData: Omit<CategoryType, "items">): Promise<CategoryType | null> => {
+const addCategory = async (catData: CategoryType): Promise<Partial<CategoryType>> => {
   try {
-    return await Category.create(catData);
+    const category= await Category.create(catData);
+    const {_id,name,description,imageUrl}=category;
+    return {_id,name,description,imageUrl};
   } catch (error) {
     throw new Error(`Error creating category: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
 };
 
-const addItem = async (itemData: ItemType): Promise<ItemType | null> => {
+const addItem = async (itemData: ItemType): Promise<Partial<ItemType>> => {
   try {
     const item = await Item.create(itemData);
-    await Category.findByIdAndUpdate(item.categoryId, { $push: { items: item._id } }).lean();
-    return item;
+    const {_id,categoryId,name,description,imageUrl,price,tiktokLink}=item;
+    return  {_id,categoryId,name,description,imageUrl,price,tiktokLink};
   } catch (error) {
     throw new Error(`Error creating item: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
@@ -40,7 +42,10 @@ const getItemsId = async (categoryId: string): Promise<string[]> => {
 
 const getCategoryDetails = async (categoryId: string): Promise<CategoryType | null> => {
   try {
-    return await Category.findById(categoryId).lean();
+    return await Category.findById(categoryId,{
+      _id:1,
+      description:1,imageUrl:1,
+    }).lean();
   } catch (error) {
     throw new Error(`Error fetching category details: ${error instanceof Error ? error.message : "Unknown error"}`);
   }
@@ -48,7 +53,9 @@ const getCategoryDetails = async (categoryId: string): Promise<CategoryType | nu
 
 const getItem = async (itemId: string): Promise<ItemType | null> => {
   try {
-    return await Item.findById(itemId).select('-createdAt -updatedAt').lean();
+    return await Item.findById(itemId,{
+      __v:0,createdAt:0,updatedAt:0
+    }).lean();
   } catch (error) {
     throw new Error(`Error fetching item: ${error instanceof Error ? error.message : "Unknown error"}`);
   }

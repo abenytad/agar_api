@@ -1,9 +1,11 @@
 import User, { UserType } from './user.mongo';
 
-const addUser = async (userData: Partial<UserType>): Promise<UserType> => {
+const addUser = async (userData: Partial<UserType>): Promise<Partial<UserType>> => {
     try {
         const user = new User(userData);
-        return await user.save();
+        const savedUser = await user.save();
+        const { name, phoneNumber, _id } = savedUser;
+        return { name, phoneNumber, _id };
     } catch (error) {
         if (error instanceof Error) {
             throw new Error(`Error creating user: ${error.message}`);
@@ -12,14 +14,13 @@ const addUser = async (userData: Partial<UserType>): Promise<UserType> => {
         }
     }
 };
-
 const getUser = async (userId: string): Promise<UserType | null> => {
     try {
         return await User.findById(userId, {
             _id: 1,
             name: 1,
             phoneNumber: 1,
-        }).lean();
+        });
     } catch (error) {
         if (error instanceof Error) {
             throw new Error(`Error fetching user: ${error.message}`);
